@@ -26,7 +26,8 @@ async function startServer() {
 async function init() {
   await startServer();
   await AWSHandler.initSDK();
-  await AWSHandler.getQueue();
+  // let queueURL = await AWSHandler.getQueue();
+  // await AWSHandler.sendMessage({ key: "hello" }, queueURL);
 }
 
 init();

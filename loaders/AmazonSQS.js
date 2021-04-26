@@ -2,29 +2,30 @@ const AWS = require("aws-sdk");
 const config = require("config");
 const { logger } = require("./log");
 const util = require("util");
+const initAmazonSDK = util
+  .promisify(AWS.config.getCredentials)
+  .bind(AWS.config);
 
 class AWSHandler {
   static _configSQS = config.get("aws.sqs");
 
-  static initSDK() {
-    AWS.config.getCredentials(function (err) {
-      if (err) {
-        logger.error(`Error in getting AWS credentials: ${err}`);
-        return;
-      } else {
-        logger.info(`AWS SDK initialized with credentials file successfully`);
-        AWS.config.update({ region: config.get("aws.region") });
-      }
-    });
+  static async initSDK() {
+    try {
+      await initAmazonSDK();
+      logger.info(`AWS SDK initialized with credentials file successfully`);
+      AWS.config.update({ region: config.get("aws.region") });
+    } catch (err) {
+      logger.error(`Error in getting AWS credentials: ${err}`);
+    }
   }
 
   static async listQueues() {
-    const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
     try {
+      logger.info(`Getting all available SQS`);
+      const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
       return await sqs.listQueues({}).promise();
     } catch (err) {
       logger.error(`Error in listQueues Function: ${util.inspect(err)}`);
-      throw err;
     }
   }
 
@@ -32,34 +33,53 @@ class AWSHandler {
     QueueName = this._configSQS.QueueName,
     Attributes = this._configSQS.Attributes
   ) {
-    const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
     const params = {
       QueueName: QueueName,
       Attributes: Attributes,
     };
     try {
+      const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
       let data = await sqs.createQueue(params).promise();
       return data.QueueUrl;
     } catch (err) {
       logger.error(`Error in createQueue Function: ${util.inspect(err)}`);
-      throw err;
     }
   }
 
   static async getQueue() {
-    const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
-
     //Checking if Queue already created
     try {
+      logger.info(
+        `Checking if there's queue already created or need create new one...`
+      );
       let queues = await this.listQueues();
 
       if (queues.QueueUrls && queues.QueueUrls.length > 0) {
+        logger.info(`Queue already created with URL: ${queues.QueueUrls[0]}`);
         return queues.QueueUrls[0];
       } else {
+        logger.info(`No Queue available. Creating new one...`);
         return await this.createQueue();
       }
     } catch (err) {
       logger.error(`Error in getQueue Function: ${err}`);
+    }
+  }
+
+  static async sendMessage(body, queueURL, DelaySeconds = 10) {
+    try {
+      const params = {
+        DelaySeconds: DelaySeconds,
+        MessageBody: JSON.stringify(body),
+        QueueUrl: queueURL,
+      };
+      const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
+      await sqs.sendMessage(params).promise();
+      logger.info(`Message sent to ${queueURL} successfully`);
+    } catch (err) {
+      logger.error(
+        `Error in sending message body to ${queueURL}: ${util.inspect(err)}`
+      );
     }
   }
 }
