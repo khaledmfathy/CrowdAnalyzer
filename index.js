@@ -1,6 +1,6 @@
 const express = require("express");
 const config = require("config");
-const { logger } = require("./loaders");
+const { logger, AWSHandler } = require("./loaders");
 
 const app = express();
 
@@ -23,4 +23,10 @@ async function startServer() {
   });
 }
 
-startServer();
+async function init() {
+  await startServer();
+  await AWSHandler.initSDK();
+  await AWSHandler.getQueue();
+}
+
+init();

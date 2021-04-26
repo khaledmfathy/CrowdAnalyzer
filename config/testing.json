@@ -10,5 +10,16 @@
     "server": {
         "environment": "testing",
         "port": "7002"
+    },
+    "aws": {
+        "region": "us-east-2",
+        "sqs":{
+            "apiVersion": "2012-11-05",
+            "QueueName": "default",
+            "Attributes": {
+                "DelaySeconds": "60",
+                "MessageRetentionPeriod": "86400"
+            }
+        }
     }
 }
