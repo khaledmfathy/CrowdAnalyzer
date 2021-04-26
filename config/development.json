@@ -1,0 +1,11 @@
+{
+    "log": {
+        "level": "silly",
+        "datePattern": "YYYY-MM-DD",
+        "handleExceptions": true
+    },
+    "server": {
+        "environment": "development",
+        "port": "7002"
+    }
+}

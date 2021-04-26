@@ -1,0 +1,14 @@
+{
+    "log": {
+        "level": "silly",
+        "maxsize": "5m",
+        "maxFiles": "14d",
+        "datePattern": "YYYY-MM-DD",
+        "zippedArchive": true,
+        "handleExceptions": true
+    },
+    "server": {
+        "environment": "production",
+        "port": "7002"
+    }
+}
