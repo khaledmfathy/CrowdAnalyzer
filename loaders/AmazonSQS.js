@@ -86,18 +86,30 @@ class AWSHandler {
       const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
       let result = await sqs.receiveMessage(params).promise();
       if (result.Messages) {
-        logger.info(
-          `Message Received from ${queueURL} successfully: ${util.inspect(
-            result.Messages
-          )}`
-        );
+        logger.info(`Message Received from ${queueURL} successfully`);
+        return result.Messages;
       } else {
         logger.info(`Queue: ${queueURL} is empty. Sleeping for 1 second...`);
+        return;
       }
     } catch (err) {
       logger.error(
         `Error in receiving message body to ${queueURL}: ${util.inspect(err)}`
       );
+      throw err;
+    }
+  }
+
+  static async deleteMessage(queueURL, ReceiptHandle) {
+    try {
+      let params = { QueueUrl: queueURL, ReceiptHandle: ReceiptHandle };
+      const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
+      await sqs.deleteMessage(params).promise();
+    } catch (err) {
+      logger.error(
+        `Error in deleting message body to ${queueURL}: ${util.inspect(err)}`
+      );
+      throw err;
     }
   }
 }

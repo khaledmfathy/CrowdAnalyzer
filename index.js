@@ -2,8 +2,13 @@ const express = require("express");
 const config = require("config");
 const { logger, AWSHandler } = require("./loaders");
 const { DataStreaming } = require("./jobs/DataStreaming");
+const {
+  EngagementTrackerRouter,
+} = require("./components/EngagementTracker/route");
 
 const app = express();
+
+app.use("/api/engagement", EngagementTrackerRouter);
 
 async function startServer() {
   app.listen(config.get("server.port"), (err) => {
@@ -28,7 +33,6 @@ async function init() {
   await startServer();
   await AWSHandler.initSDK();
   await DataStreaming.startStreaming();
-  await DataStreaming.startConsuming();
 }
 
 init();
