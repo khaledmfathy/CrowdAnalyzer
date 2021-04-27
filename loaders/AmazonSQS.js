@@ -21,7 +21,6 @@ class AWSHandler {
 
   static async listQueues() {
     try {
-      logger.info(`Getting all available SQS`);
       const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
       return await sqs.listQueues({}).promise();
     } catch (err) {
@@ -49,13 +48,9 @@ class AWSHandler {
   static async getQueue() {
     //Checking if Queue already created
     try {
-      logger.info(
-        `Checking if there's queue already created or need create new one...`
-      );
       let queues = await this.listQueues();
 
       if (queues.QueueUrls && queues.QueueUrls.length > 0) {
-        logger.info(`Queue already created with URL: ${queues.QueueUrls[0]}`);
         return queues.QueueUrls[0];
       } else {
         logger.info(`No Queue available. Creating new one...`);

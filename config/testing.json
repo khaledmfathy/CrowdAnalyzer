@@ -21,5 +21,9 @@
                 "MessageRetentionPeriod": "86400"
             }
         }
+    },
+    "stream": {
+        "minDelay": 20,
+        "maxDelay": 120
     }
 }

@@ -1,6 +1,7 @@
 const express = require("express");
 const config = require("config");
 const { logger, AWSHandler } = require("./loaders");
+const { DataStreaming } = require("./jobs/DataStreaming");
 
 const app = express();
 
@@ -26,8 +27,7 @@ async function startServer() {
 async function init() {
   await startServer();
   await AWSHandler.initSDK();
-  // let queueURL = await AWSHandler.getQueue();
-  // await AWSHandler.sendMessage({ key: "hello" }, queueURL);
+  await DataStreaming.startStreaming();
 }
 
 init();
