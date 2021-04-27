@@ -1,12 +1,7 @@
 const { logger, AWSHandler } = require("../../loaders");
 const util = require("util");
-
-function _escapeCharactersFormatter(data) {
-  data = data.replace('"{', "{");
-  data = data.replace(/\\"/g, '"');
-  data = data.replace('}"', "}");
-  return data;
-}
+const { Helper } = require("../../utils/Helper");
+const { EngagementTrackerService } = require("./service");
 
 async function _dequeue() {
   try {
@@ -15,7 +10,7 @@ async function _dequeue() {
     let data = await AWSHandler.receiveMessage(queueURL);
     if (data && Array.isArray(data)) {
       for (const message of data) {
-        result.push(JSON.parse(_escapeCharactersFormatter(message.Body)));
+        result.push(JSON.parse(Helper.escapeCharactersFormatter(message.Body)));
         await AWSHandler.deleteMessage(queueURL, message.ReceiptHandle);
       }
     }
@@ -26,11 +21,32 @@ async function _dequeue() {
   }
 }
 
+function _enrichTotalEngagements(msgObj) {
+  let totalEngagements =
+    msgObj.engagements.likes +
+    msgObj.engagements.love +
+    msgObj.engagements.haha +
+    msgObj.engagements.angry;
+
+  msgObj.total_engagements = totalEngagements;
+  return msgObj;
+}
+
 class EngagementTrackerController {
   static async track(req, res) {
     try {
       logger.info(`Start Tracking Function`);
-      let result = await _dequeue();
+      let result = [];
+      let receivedMsgs = await _dequeue();
+      for (let msgObj of receivedMsgs) {
+        let orgSettings = EngagementTrackerService.getOrganizationSettings(
+          msgObj.organization_id
+        );
+        if (orgSettings.options.track_engagements) {
+          msgObj = _enrichTotalEngagements(msgObj);
+        }
+        result.push(msgObj);
+      }
       res.status(200).json(result);
     } catch (err) {
       logger.error(`Error in track function: ${util.inspect(err)}`);

@@ -25,6 +25,26 @@ class InteractionEngagement {
   }
 }
 
+class OrganizationSettings {
+  _id;
+  organization_id;
+  organization_category;
+  options;
+
+  constructor() {
+    this._id = require("mongoose").Types.ObjectId();
+    this.organization_id = require("mongoose").Types.ObjectId();
+    this.organization_category = "@org-categories/researcher";
+    this.options = {
+      track_engagements: faker.datatype.boolean(),
+      track_daily_visits: faker.datatype.boolean(),
+      track_quota_consumption: faker.datatype.boolean(),
+      track_reports_clicks: faker.datatype.boolean(),
+    };
+  }
+}
+
 module.exports = {
   InteractionEngagement: InteractionEngagement,
+  OrganizationSettings: OrganizationSettings,
 };

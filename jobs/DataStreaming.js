@@ -1,5 +1,7 @@
 const { logger, AWSHandler } = require("../loaders");
-const { InteractionEngagement } = require("../utils/DataGeneration");
+const {
+  InteractionEngagement,
+} = require("../components/EngagementTracker/model");
 const util = require("util");
 const config = require("config");
 
