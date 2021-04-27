@@ -30,7 +30,7 @@ class AWSHandler {
 
   static async createQueue(
     QueueName = this._configSQS.QueueName,
-    Attributes = this._configSQS.Attributes
+    Attributes = this._configSQS.NewQueueAttributes
   ) {
     const params = {
       QueueName: QueueName,
@@ -74,6 +74,29 @@ class AWSHandler {
     } catch (err) {
       logger.error(
         `Error in sending message body to ${queueURL}: ${util.inspect(err)}`
+      );
+    }
+  }
+
+  static async receiveMessage(queueURL) {
+    try {
+      const attributes = this._configSQS.RecieveMsgAttributes;
+      let params = {};
+      params = Object.assign(params, attributes, { QueueUrl: queueURL });
+      const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
+      let result = await sqs.receiveMessage(params).promise();
+      if (result.Messages) {
+        logger.info(
+          `Message Received from ${queueURL} successfully: ${util.inspect(
+            result.Messages
+          )}`
+        );
+      } else {
+        logger.info(`Queue: ${queueURL} is empty. Sleeping for 1 second...`);
+      }
+    } catch (err) {
+      logger.error(
+        `Error in receiving message body to ${queueURL}: ${util.inspect(err)}`
       );
     }
   }

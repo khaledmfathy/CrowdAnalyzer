@@ -16,9 +16,20 @@
         "sqs":{
             "apiVersion": "2012-11-05",
             "QueueName": "default",
-            "Attributes": {
+            "NewQueueAttributes": {
                 "DelaySeconds": "60",
                 "MessageRetentionPeriod": "86400"
+            },
+            "RecieveMsgAttributes": {
+                "AttributeNames": [
+                    "SentTimestamp"
+                 ],
+                 "MaxNumberOfMessages": 10,
+                 "MessageAttributeNames": [
+                    "All"
+                 ],
+                 "VisibilityTimeout": 20,
+                 "WaitTimeSeconds": 0
             }
         }
     },

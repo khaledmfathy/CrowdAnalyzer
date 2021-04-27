@@ -28,6 +28,7 @@ async function init() {
   await startServer();
   await AWSHandler.initSDK();
   await DataStreaming.startStreaming();
+  await DataStreaming.startConsuming();
 }
 
 init();

@@ -13,6 +13,15 @@ async function _enqueue() {
   }
 }
 
+async function _dequeue() {
+  try {
+    let queueURL = await AWSHandler.getQueue();
+    return await AWSHandler.receiveMessage(queueURL);
+  } catch (err) {
+    logger.error(`Error in dequeue function: ${util.inspect(err)}`);
+  }
+}
+
 class DataStreaming {
   static async startStreaming() {
     try {
@@ -26,7 +35,14 @@ class DataStreaming {
     }
   }
 
-  static startConsuming() {}
+  static async startConsuming() {
+    try {
+      await _dequeue();
+      setTimeout(DataStreaming.startConsuming, 1000);
+    } catch (err) {
+      logger.error(`Error in startConsuming function: ${util.inspect(err)}`);
+    }
+  }
 }
 
 module.exports = {
