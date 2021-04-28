@@ -7,7 +7,7 @@ const config = require("config");
 
 async function _enqueue() {
   try {
-    let queueURL = await AWSHandler.getQueue();
+    let queueURL = await AWSHandler.getQueueUrl();
     let randObj = new InteractionEngagement();
     await AWSHandler.sendMessage(JSON.stringify(randObj), queueURL);
   } catch (err) {

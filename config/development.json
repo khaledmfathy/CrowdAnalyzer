@@ -12,7 +12,8 @@
         "region": "us-east-2",
         "sqs":{
             "apiVersion": "2012-11-05",
-            "QueueName": "default",
+            "ConvQueue": "ConvQueue",
+            "EnrichedQueue": "EnrichedQueue",
             "NewQueueAttributes": {
                 "DelaySeconds": "60",
                 "MessageRetentionPeriod": "86400"
@@ -25,7 +26,7 @@
                  "MessageAttributeNames": [
                     "All"
                  ],
-                 "VisibilityTimeout": 20,
+                 "VisibilityTimeout": 0,
                  "WaitTimeSeconds": 0
             }
         }

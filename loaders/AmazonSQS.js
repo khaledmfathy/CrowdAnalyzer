@@ -19,17 +19,21 @@ class AWSHandler {
     }
   }
 
-  static async listQueues() {
+  static async getQueueUrl(queueName = this._configSQS.ConvQueue) {
     try {
       const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
-      return await sqs.listQueues({}).promise();
+      let result = await sqs.getQueueUrl({ QueueName: queueName }).promise();
+      return result.QueueUrl;
     } catch (err) {
-      logger.error(`Error in listQueues Function: ${util.inspect(err)}`);
+      logger.info(
+        `No Queue available with name: ${queueName}. Creating new one...`
+      );
+      return await this.createQueue(queueName);
     }
   }
 
   static async createQueue(
-    QueueName = this._configSQS.QueueName,
+    QueueName = this._configSQS.ConvQueue,
     Attributes = this._configSQS.NewQueueAttributes
   ) {
     const params = {
@@ -45,23 +49,7 @@ class AWSHandler {
     }
   }
 
-  static async getQueue() {
-    //Checking if Queue already created
-    try {
-      let queues = await this.listQueues();
-
-      if (queues.QueueUrls && queues.QueueUrls.length > 0) {
-        return queues.QueueUrls[0];
-      } else {
-        logger.info(`No Queue available. Creating new one...`);
-        return await this.createQueue();
-      }
-    } catch (err) {
-      logger.error(`Error in getQueue Function: ${err}`);
-    }
-  }
-
-  static async sendMessage(body, queueURL, DelaySeconds = 10) {
+  static async sendMessage(body, queueURL, DelaySeconds = 60) {
     try {
       const params = {
         DelaySeconds: DelaySeconds,
@@ -73,7 +61,9 @@ class AWSHandler {
       logger.info(`Message sent to ${queueURL} successfully`);
     } catch (err) {
       logger.error(
-        `Error in sending message body to ${queueURL}: ${util.inspect(err)}`
+        `Error in sending message body to ${util.inspect(
+          queueURL
+        )}: ${util.inspect(err)}`
       );
     }
   }
@@ -89,7 +79,7 @@ class AWSHandler {
         logger.info(`Message Received from ${queueURL} successfully`);
         return result.Messages;
       } else {
-        logger.info(`Queue: ${queueURL} is empty. Sleeping for 1 second...`);
+        logger.info(`Queue: ${queueURL} is empty.`);
         return;
       }
     } catch (err) {
