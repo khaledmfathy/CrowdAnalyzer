@@ -1,8 +1,9 @@
-const { logger, AWSHandler } = require("../../loaders");
+const { logger, engagementLogger, AWSHandler } = require("../../loaders");
 const util = require("util");
 const { Helper } = require("../../utils/Helper");
 const { EngagementTrackerService } = require("./service");
 const config = require("config");
+let { id, TotalEngagements } = require("../../constants");
 
 async function _dequeue() {
   try {
@@ -39,11 +40,18 @@ function _enrichTotalEngagements(msgObj) {
 
 async function _enqueue(msgObj) {
   //Push Enriched Object to Another SQS
-  let enrichedSQSURL = await AWSHandler.getQueueUrl(
-    config.get("aws.sqs.EnrichedQueue")
-  );
-  await AWSHandler.sendMessage(JSON.stringify(msgObj), enrichedSQSURL);
-  return msgObj;
+  try {
+    let enrichedSQSURL = await AWSHandler.getQueueUrl(
+      config.get("aws.sqs.EnrichedQueue")
+    );
+    await AWSHandler.sendMessage(JSON.stringify(msgObj), enrichedSQSURL);
+    return msgObj;
+  } catch (err) {
+    logger.error(
+      `Error in sending msgObj to EnrichedQueue: ${util.inspect(err)}`
+    );
+    throw err;
+  }
 }
 
 class EngagementTrackerController {
@@ -64,6 +72,10 @@ class EngagementTrackerController {
           //Enrich conversation with track engagements.
           msgObj = _enrichTotalEngagements(msgObj);
           promises.push(_enqueue(msgObj));
+          id++;
+          TotalEngagements += msgObj.total_engagements;
+          TotalEngagements = TotalEngagements / id;
+          engagementLogger.info(TotalEngagements);
         } else {
           result.push(msgObj);
         }

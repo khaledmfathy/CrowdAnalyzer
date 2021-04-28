@@ -2,7 +2,15 @@
     "log": {
         "level": "silly",
         "datePattern": "YYYY-MM-DD",
-        "handleExceptions": true
+        "handleExceptions": true,
+        "total_engagements":{
+            "filename": "logs/engagements-%DATE%.log",
+            "maxsize": "5m",
+            "maxFiles": "14d",
+            "datePattern": "YYYY-MM-DD",
+            "zippedArchive": true,
+            "handleExceptions": true
+        }
     },
     "server": {
         "environment": "default",
@@ -26,7 +34,7 @@
                  "MessageAttributeNames": [
                     "All"
                  ],
-                 "VisibilityTimeout": 0,
+                 "VisibilityTimeout": 20,
                  "WaitTimeSeconds": 0
             }
         }

@@ -1,11 +1,31 @@
 {
     "log": {
         "level": "silly",
-        "maxsize": "5m",
-        "maxFiles": "14d",
-        "datePattern": "YYYY-MM-DD",
-        "zippedArchive": true,
-        "handleExceptions": true
+        "errorFiles":{
+            "filename": "logs/errors-%DATE%.log",
+            "maxsize": "5m",
+            "maxFiles": "14d",
+            "datePattern": "YYYY-MM-DD",
+            "zippedArchive": true,
+            "handleExceptions": true,
+            "level": "error"
+        },
+        "combinedFiles":{
+            "filename": "logs/combined-%DATE%.log",
+            "maxsize": "5m",
+            "maxFiles": "14d",
+            "datePattern": "YYYY-MM-DD",
+            "zippedArchive": true,
+            "handleExceptions": true
+        },
+        "total_engagements":{
+            "filename": "logs/engagements-%DATE%.log",
+            "maxsize": "5m",
+            "maxFiles": "14d",
+            "datePattern": "YYYY-MM-DD",
+            "zippedArchive": true,
+            "handleExceptions": true
+        }
     },
     "server": {
         "environment": "testing",

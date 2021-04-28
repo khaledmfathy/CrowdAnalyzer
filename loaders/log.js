@@ -42,4 +42,22 @@ const logger = winston.createLogger({
   exitOnError: false,
 });
 
-module.exports = { logger: logger };
+const engagementLogger = winston.createLogger({
+  level: config.get("log.level"),
+  levels: winston.config.npm.levels,
+  format: winston.format.combine(
+    winston.format.timestamp({
+      format: "YYYY-MM-DD HH:mm:ss A",
+    }),
+    winston.format.prettyPrint()
+  ),
+  transports: [
+    new winston.transports.DailyRotateFile(config.get("log.total_engagements")),
+  ],
+  exitOnError: false,
+});
+
+module.exports = {
+  logger: logger,
+  engagementLogger: engagementLogger,
+};
