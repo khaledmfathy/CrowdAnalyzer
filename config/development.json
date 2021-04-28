@@ -35,7 +35,7 @@
                     "All"
                  ],
                  "VisibilityTimeout": 20,
-                 "WaitTimeSeconds": 0
+                 "WaitTimeSeconds": 20
             }
         }
     },

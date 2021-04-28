@@ -76,7 +76,9 @@ class AWSHandler {
       const sqs = new AWS.SQS({ apiVersion: this._configSQS.apiVersion });
       let result = await sqs.receiveMessage(params).promise();
       if (result.Messages) {
-        logger.info(`Message Received from ${queueURL} successfully`);
+        logger.info(
+          `${result.Messages.length} Messages Received from ${queueURL} successfully.`
+        );
         return result.Messages;
       } else {
         logger.info(`Queue: ${queueURL} is empty.`);
