@@ -36,3 +36,5 @@ async function init() {
 }
 
 init();
+
+module.exports = app;

@@ -1,4 +1,5 @@
 const faker = require("faker");
+const mongoose = require("mongoose");
 
 class InteractionEngagement {
   id;
@@ -11,7 +12,7 @@ class InteractionEngagement {
 
   constructor() {
     this.id = faker.datatype.number({ min: 34655948135 });
-    this.organization_id = require("mongoose").Types.ObjectId();
+    this.organization_id = mongoose.Types.ObjectId();
     this.type = "post";
     this.source = "facebook";
     this.link = "https://facebook.com/fake-post";

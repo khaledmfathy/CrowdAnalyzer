@@ -23,6 +23,7 @@ if (
         winston.format.cli(),
         winston.format.simple()
       ),
+      silent: process.argv.indexOf("--silent") >= 0,
     })
   );
 }
